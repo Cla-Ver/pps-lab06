@@ -1,0 +1,49 @@
+name: CI
+on:
+  push:
+    tags: '*'
+    branches-ignore:
+      - 'autodelivery**'
+      - 'bump-**'
+      - 'renovate/**'
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - 'README.md'
+      - '../../../pps-lab05/renovate.json'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    if: contains(github.repository, 'pps-lab06') && !github.event.repository.fork
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2025
+          - macos-15
+          - ubuntu-24.04
+        jvm_version: [ 21, 25 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+      - name: Build and test
+        uses: nicolasfara/build-check-deploy-sbt-action@1.0.44
+        with:
+          should-run-codecov: false
+          should-deploy: false
+
+  success:
+    runs-on: ubuntu-24.04
+    needs:
+      - build
+    if: >-
+      always() && (
+        contains(join(needs.*.result, ','), 'failure')
+        || !contains(join(needs.*.result, ','), 'cancelled')
+      )
+    steps:
+      - name: Verify that there were no failures
+        run: ${{ !contains(join(needs.*.result, ','), 'failure') }}
