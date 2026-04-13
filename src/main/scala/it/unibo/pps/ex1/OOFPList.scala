@@ -1,5 +1,7 @@
 package it.unibo.pps.ex1
 
+import scala.annotation.tailrec
+
 // List as a pure interface
 enum List[A]:
   case ::(h: A, t: List[A])
@@ -46,8 +48,15 @@ enum List[A]:
     case h :: t => t.foldLeft(h)(op)
   
   // Exercise: implement the following methods
-  def zipWithValue[B](value: B): List[(A, B)] = ???
-  def length(): Int = ???
+  def zipWithValue[B](value: B): List[(A, B)] =
+    @tailrec
+    def zip(value: B, remainingList: List[A], result: List[(A, B)]): List[(A, B)] = remainingList match
+      case h :: t => zip(value, t, result.append(List((h, value))))
+      case _ => result
+
+    zip(value, this, Nil())
+
+  def length(): Int = foldLeft(0)((counter, _) => counter + 1)
   def indices(): List[Int] = ???
   def zipWithIndex: List[(A, Int)] = ???
   def partition(predicate: A => Boolean): (List[A], List[A]) = ???
@@ -82,10 +91,10 @@ object Test extends App:
   println(unzipWithFold(List((1, 2), (4, 3), (10, 20)))) //
   println(reference.zipWithValue(10)) // List((1, 10), (2, 10), (3, 10), (4, 10))
   println(reference.length()) // 4
-  println(reference.indices()) // List(0, 1, 2, 3)
+  /*println(reference.indices()) // List(0, 1, 2, 3)
   println(reference.zipWithIndex) // List((1, 0), (2, 1), (3, 2), (4, 3))
   println(reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
   println(reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
   println(reference.span(_ < 3)) // (List(1, 2), List(3, 4))
   println(reference.takeRight(3)) // List(2, 3, 4)
-  println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)
+  println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)*/
