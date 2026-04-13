@@ -76,14 +76,7 @@ enum List[A]:
 
     right(n, this)
 
-  def collect(predicate: PartialFunction[A, A]): List[A] =
-    @tailrec
-    def coll(predicate: PartialFunction[A, A], remainingList: List[A], result: List[A]): List[A] = remainingList match
-      case h :: t if predicate.isDefinedAt(h) => coll(predicate, t, result.append(List(predicate(h))))
-      case _ :: t => coll(predicate, t, result)
-      case _ => result
-
-    coll(predicate, this, Nil())
+  def collect(predicate: PartialFunction[A, A]): List[A] = foldRight(Nil())((h, list) => if (predicate.isDefinedAt(h)) (predicate(h) :: list) else list)
 
 // Factories
 object List:
@@ -115,8 +108,8 @@ object Test extends App:
   //println(reference.length()) // 4
   //println(reference.indices()) // List(0, 1, 2, 3)
   //println(reference.zipWithIndex) // List((1, 0), (2, 1), (3, 2), (4, 3))
-  println(reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
+  //println(reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
   //println(reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
   //println(reference.span(_ < 3)) // (List(1, 2), List(3, 4))
   //println(reference.takeRight(3)) // List(2, 3, 4)
-  //println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)
+  println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)
