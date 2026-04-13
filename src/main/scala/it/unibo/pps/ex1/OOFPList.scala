@@ -76,7 +76,14 @@ enum List[A]:
 
     spanHelper(predicate, this, Nil())
 
-  def takeRight(n: Int): List[A] = ???
+  def takeRight(n: Int): List[A] =
+    @tailrec
+    def right(n: Int, list: List[A]): List[A] = list match
+      case h :: t if list.length() > n => right(n, t)
+      case _ => list
+
+    right(n, this)
+
   def collect(predicate: PartialFunction[A, A]): List[A] = ???
 // Factories
 object List:
@@ -111,5 +118,5 @@ object Test extends App:
   println(reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
   println(reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
   println(reference.span(_ < 3)) // (List(1, 2), List(3, 4))
-  /*println(reference.takeRight(3)) // List(2, 3, 4)
-  println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)*/
+  println(reference.takeRight(3)) // List(2, 3, 4)
+  /*println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)*/
