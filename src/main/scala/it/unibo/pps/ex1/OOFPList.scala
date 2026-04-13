@@ -58,8 +58,7 @@ enum List[A]:
   // Using match to avoid using result._1 and result._2 instead
   // Maybe foldLeft + reverse for better performance and tail recursion?
   def partition(predicate: A => Boolean): (List[A], List[A]) = foldRight((Nil(), Nil()))((e, result) => result match
-    case (list1, list2) if predicate(e) =>  (e :: list1, list2)
-    case (list1, list2) => (list1, e :: list2))
+    case (list1, list2) => if (predicate(e)) (e :: list1, list2) else (list1, e :: list2))
 
   def span(predicate: A => Boolean): (List[A], List[A]) =
     @tailrec
