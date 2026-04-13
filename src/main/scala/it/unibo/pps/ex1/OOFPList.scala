@@ -68,7 +68,14 @@ enum List[A]:
 
     part(predicate, this, Nil(), Nil())
 
-  def span(predicate: A => Boolean): (List[A], List[A]) = ???
+  def span(predicate: A => Boolean): (List[A], List[A]) =
+    @tailrec
+    def spanHelper(predicate: A => Boolean, remainingList: List[A], passingPredicateList: List[A]): (List[A], List[A]) = remainingList match
+      case h :: t if predicate(h) => spanHelper(predicate, t, passingPredicateList.append(List(h)))
+      case _ => (passingPredicateList, remainingList)
+
+    spanHelper(predicate, this, Nil())
+
   def takeRight(n: Int): List[A] = ???
   def collect(predicate: PartialFunction[A, A]): List[A] = ???
 // Factories
@@ -102,7 +109,7 @@ object Test extends App:
   println(reference.indices()) // List(0, 1, 2, 3)
   println(reference.zipWithIndex) // List((1, 0), (2, 1), (3, 2), (4, 3))
   println(reference.partition(_ % 2 == 0)) // (List(2, 4), List(1, 3))
-  /*println(reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
+  println(reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
   println(reference.span(_ < 3)) // (List(1, 2), List(3, 4))
-  println(reference.takeRight(3)) // List(2, 3, 4)
+  /*println(reference.takeRight(3)) // List(2, 3, 4)
   println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)*/
