@@ -79,12 +79,20 @@ enum List[A]:
   def takeRight(n: Int): List[A] =
     @tailrec
     def right(n: Int, list: List[A]): List[A] = list match
-      case h :: t if list.length() > n => right(n, t)
+      case _ :: t if list.length() > n => right(n, t)
       case _ => list
 
     right(n, this)
 
-  def collect(predicate: PartialFunction[A, A]): List[A] = ???
+  def collect(predicate: PartialFunction[A, A]): List[A] =
+    @tailrec
+    def coll(predicate: PartialFunction[A, A], remainingList: List[A], result: List[A]): List[A] = remainingList match
+      case h :: t if predicate.isDefinedAt(h) => coll(predicate, t, result.append(List(predicate(h))))
+      case h :: t => coll(predicate, t, result)
+      case _ => result
+
+    coll(predicate, this, Nil())
+
 // Factories
 object List:
 
@@ -119,4 +127,4 @@ object Test extends App:
   println(reference.span(_ % 2 != 0)) // (List(1), List(2, 3, 4))
   println(reference.span(_ < 3)) // (List(1, 2), List(3, 4))
   println(reference.takeRight(3)) // List(2, 3, 4)
-  /*println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)*/
+  println(reference.collect { case x if x % 2 == 0 => x + 1 }) // List(3, 5)
