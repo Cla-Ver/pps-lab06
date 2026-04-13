@@ -46,13 +46,20 @@ enum List[A]:
   def reduce(op: (A, A) => A): A = this match
     case Nil() => throw new IllegalStateException()
     case h :: t => t.foldLeft(h)(op)
-  
+
+  private def reverse(list: List[A]): List[A] = list.foldLeft(Nil())((acc, elem) => elem :: acc)
+
   // Exercise: implement the following methods
   def zipWithValue[B](value: B): List[(A, B)] = this.map(e => (e, value))
   def length(): Int = foldLeft(0)((counter, _) => counter + 1)
   def indices(): List[Int] = foldLeft(Nil())((list, _) => list.append(List(list.length())))
   def zipWithIndex: List[(A, Int)] = foldLeft(Nil())((list, h) => list.append(List((h, list.length())))) // Done with foldLeft instead of foldRight?
-  def partition(predicate: A => Boolean): (List[A], List[A]) = foldLeft((Nil(), Nil()))((result, e) => if (predicate(e)) (result._1.append(List(e)), result._2) else (result._1, result._2.append(List(e)))) // Possibly prepend and reverse?
+
+  // Using match to avoid using result._1 and result._2 instead
+  // Maybe foldLeft + reverse for better performance and tail recursion?
+  def partition(predicate: A => Boolean): (List[A], List[A]) = foldRight((Nil(), Nil()))((e, result) => result match
+    case (list1, list2) if predicate(e) =>  (e :: list1, list2)
+    case (list1, list2) => (list1, e :: list2))
 
   def span(predicate: A => Boolean): (List[A], List[A]) =
     @tailrec
