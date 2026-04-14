@@ -8,10 +8,6 @@ enum Question:
   case CONFIDENCE
   case FINAL
 
-/*object Question:
-  private case class QuestionImpl(relevance: Int, significance: Int, confidence: Int, finalScore: Int)
-  def apply(relevance: Int, significance: Int, confidence: Int, finalScore: Int): Question = QuestionImpl(relevance, significance, confidence, finalScore)*/
-
 trait ConferenceReviewing:
   def loadReview(article: Int, scores: Map[Question, Int]): Unit
   def loadReview(article: Int, relevance: Int, significance: Int, confidence: Int, fin: Int): Unit
@@ -48,3 +44,5 @@ object ConferenceReviewing:
     private def doesArticleHaveEnoughRelevance(article: Int): Boolean = cr.reviews.exists(review => review.article == article && review.scores(Question.RELEVANCE) >= 8.0)
 
     def acceptedArticles(): Set[Int] = cr.reviews.map(review => review.article).distinct.filter(article => doesArticleHaveEnoughRelevance(article) && averageFinalScore(article) >= 5.0).sorted.toSet
+
+    def sortedAcceptedArticles(): List[Pair[Int, Double]] = acceptedArticles().toList.map(e => Pair(e, averageFinalScore(e))).sorted((r1, r2) => r1._2.compareTo(r2._2))

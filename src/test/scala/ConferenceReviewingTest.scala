@@ -59,13 +59,11 @@ class ConferenceReviewingTest:
     @Test def testAcceptedArticles(): Unit =
       // solo gli articoli 1,2,4 vanno accettati, avendo media finale >=5 e almeno un voto su RELEVANCE >= 8
       assertEquals(cr.acceptedArticles(), Set(1,2,4));
-/*
-    @org.junit.Test
-    public void testSortedAcceptedArticles() {
-      // articoli accettati, e loro voto finale medio
-      assertEquals(cr.sortedAcceptedArticles(),Arrays.asList(new Pair<>(4,7.0),new Pair<>(2,7.5),new Pair<>(1,8.5)));
-    }
 
+    @Test def testSortedAcceptedArticles(): Unit =
+      // articoli accettati, e loro voto finale medio
+      assertEquals(cr.sortedAcceptedArticles(), List(Pair(4,7.0), Pair(2,7.5), Pair(1,8.5)));
+/*
     @org.junit.Test
     public void optionalTestAverageWeightedFinalScore() {
       // l'articolo 1 ha media pesata finale pari a (4.8+5.4)/2 = 5,1, con scarto massimo 0.01
