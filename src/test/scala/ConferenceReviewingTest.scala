@@ -44,8 +44,8 @@ class ConferenceReviewingTest:
       assertEquals(cr.orderedScores(4, Question.CONFIDENCE), List(6,7,8));
       assertEquals(cr.orderedScores(5, Question.FINAL), List(10,10));
     
-/*
-    @Test def testAverageFinalScore() {
+
+    @Test def testAverageFinalScore(): Unit = 
       // l'articolo 1 ha preso voto medio su FINAL pari a 8.5, con scarto massimo 0.01
       assertEquals(cr.averageFinalScore(1),8.5,0.01);
       // e simile per gli altri
@@ -53,13 +53,11 @@ class ConferenceReviewingTest:
       assertEquals(cr.averageFinalScore(3),3.5,0.01);
       assertEquals(cr.averageFinalScore(4),7.0,0.01);
       assertEquals(cr.averageFinalScore(5),10.0,0.01);
-    }
-
-    @org.junit.Test
-    public void testAcceptedArticles() {
+    
+/*
+    @Test def testAcceptedArticles(): Unit = 
       // solo gli articoli 1,2,4 vanno accettati, avendo media finale >=5 e almeno un voto su RELEVANCE >= 8
       assertEquals(cr.acceptedArticles(),new HashSet<>(Arrays.asList(1,2,4)));
-    }
 
     @org.junit.Test
     public void testSortedAcceptedArticles() {

@@ -1,5 +1,7 @@
 package it.unibo.pps.ex2
 
+import it.unibo.pps.ex2.Question.FINAL
+
 enum Question:
   case RELEVANCE
   case SIGNIFICANCE
@@ -38,3 +40,11 @@ object ConferenceReviewing:
       cr.reviews = Review(article, scores) :: cr.reviews
 
     def orderedScores(article: Int, question: Question): List[Int] = cr.reviews.filter(review => review.article == article).map(review => review.scores(question)).sorted
+
+    def averageFinalScore(article: Int): Double = cr.reviews.foldLeft((0.0, 0))((acc, review) => acc match
+      case (sum, count) => if (review.article == article) (sum + review.scores(Question.FINAL), count + 1) else acc) match
+      case (sum, count) if count > 0 => sum / count
+      case _ => 0.0
+/*cr.reviews.filter(review => review.article == article)
+                                                            .map(review => review.scores(Question.FINAL))
+                                                            .foldLeft((0.0, 0))((acc, n) => (acc._1 + n, acc._2 + 1))*/
