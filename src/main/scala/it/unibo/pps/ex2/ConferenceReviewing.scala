@@ -41,10 +41,10 @@ object ConferenceReviewing:
 
     def orderedScores(article: Int, question: Question): List[Int] = cr.reviews.filter(review => review.article == article).map(review => review.scores(question)).sorted
 
-    def averageFinalScore(article: Int): Double = cr.reviews.foldLeft((0.0, 0))((acc, review) => acc match
-      case (sum, count) => if (review.article == article) (sum + review.scores(Question.FINAL), count + 1) else acc) match
+    def averageFinalScore(article: Int): Double = cr.reviews.foldLeft((0.0, 0))((acc, review) => if (review.article == article) (acc._1 + review.scores(Question.FINAL), acc._2 + 1) else acc) match
       case (sum, count) if count > 0 => sum / count
       case _ => 0.0
-/*cr.reviews.filter(review => review.article == article)
-                                                            .map(review => review.scores(Question.FINAL))
-                                                            .foldLeft((0.0, 0))((acc, n) => (acc._1 + n, acc._2 + 1))*/
+
+    private def doesArticleHaveEnoughRelevance(article: Int): Boolean = cr.reviews.exists(review => review.article == article && review.scores(Question.RELEVANCE) >= 8.0)
+
+    def acceptedArticles(): Set[Int] = cr.reviews.map(review => review.article).distinct.filter(article => doesArticleHaveEnoughRelevance(article) && averageFinalScore(article) >= 5.0).sorted.toSet
