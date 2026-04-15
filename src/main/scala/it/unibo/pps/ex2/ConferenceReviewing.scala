@@ -35,11 +35,11 @@ object ConferenceReviewing:
       case (sum, count) if count > 0 => sum / count
       case _ => 0.0
 
-    def averageFinalScore(article: Int): Double = averageBy(article, r => r.scores(FINAL))
+    def averageFinalScore(article: Int): Double = averageBy(article, r => r.scores(Question.FINAL))
 
     private def doesArticleHaveEnoughRelevance(article: Int): Boolean = cr.reviews.exists(review => review.article == article && review.scores(Question.RELEVANCE) >= 8.0)
 
-    private def averageWeightedFinalScore(article: Int): Double = averageBy(article, r => r.scores(FINAL) * r.scores(CONFIDENCE) / 10.0)
+    private def averageWeightedFinalScore(article: Int): Double = averageBy(article, r => r.scores(Question.FINAL) * r.scores(Question.CONFIDENCE) / 10.0)
 
     def acceptedArticles(): Set[Int] = cr.reviews.map(review => review.article).distinct.filter(article => doesArticleHaveEnoughRelevance(article) && averageFinalScore(article) >= 5.0).sorted.toSet
 
