@@ -31,20 +31,18 @@ object ConferenceReviewing:
 
     def orderedScores(article: Int, question: Question): List[Int] = cr.reviews.filter(review => review.article == article).map(review => review.scores(question)).sorted
 
-    def averageFinalScore(article: Int): Double = averageQuestionScore(article, Question.FINAL)
+    private def averageBy(article: Int, formula: Review => Double) = cr.reviews.foldLeft((0.0, 0))((acc, review) => if (review.article == article) (acc._1 + formula(review), acc._2 + 1) else acc) match
+      case (sum, count) if count > 0 => sum / count
+      case _ => 0.0
+
+    def averageFinalScore(article: Int): Double = averageBy(article, r => r.scores(FINAL))
 
     private def doesArticleHaveEnoughRelevance(article: Int): Boolean = cr.reviews.exists(review => review.article == article && review.scores(Question.RELEVANCE) >= 8.0)
 
-    private def averageQuestionScore(article: Int, question: Question) = cr.reviews.foldLeft((0.0, 0))((acc, review) => if (review.article == article) (acc._1 + review.scores(question), acc._2 + 1) else acc) match
-      case (sum, count) if count > 0 => sum / count
-      case _ => 0.0
-      
-    private def averageWeightedFinalScore(article: Int): Double = cr.reviews.foldLeft((0.0, 0))((acc, review) => if (review.article == article) (acc._1 + (review.scores(FINAL) * review.scores(CONFIDENCE) / 10.0), acc._2 + 1) else acc) match
-      case (sum, count) if count > 0 => sum / count
-      case _ => 0.0
+    private def averageWeightedFinalScore(article: Int): Double = averageBy(article, r => r.scores(FINAL) * r.scores(CONFIDENCE) / 10.0)
 
     def acceptedArticles(): Set[Int] = cr.reviews.map(review => review.article).distinct.filter(article => doesArticleHaveEnoughRelevance(article) && averageFinalScore(article) >= 5.0).sorted.toSet
 
     def sortedAcceptedArticles(): List[Pair[Int, Double]] = acceptedArticles().toList.map(e => Pair(e, averageFinalScore(e))).sorted((r1, r2) => r1._2.compareTo(r2._2))
-    
+
     def averageWeightedFinalScoreMap(): Map[Int, Double] = cr.reviews.map(review => review.article).distinct.map(e => (e, averageWeightedFinalScore(e))).toMap
